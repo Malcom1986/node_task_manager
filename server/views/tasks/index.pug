@@ -1,0 +1,47 @@
+extends ../layouts/application.pug
+
+block header
+  = t('layouts.application.tasks')
+
+block content
+  a.btn.btn-primary.mb-5(href=route('newTask'))= t('views.task.create')
+
+  .card.shadow-sm
+    .card-body.p-4
+      form(action=route('tasks') method='get')
+        .row
+          .col-12.col-md
+            +filterSelect('task',  filterOptions, 'status', statuses)
+          .col-12.col-md
+            +filterSelect('task',  filterOptions, 'executor', users)
+          .col-12.col-md
+            +filterSelect('task',  filterOptions, 'label', labels)
+        +filterCheckBox('task',  filterOptions, 'isCreatorUser')
+        +submit()(value= t(`views.task.filter.submit`))
+
+
+  div.table-responsive
+    table.table.table-borderless.table-striped.mt-5.bg-white
+      thead
+        tr
+          th.py-3= t('views.task.id')
+          th.py-3= t('views.task.name')
+          th.py-3= t('views.task.status')
+          th.py-3= t('views.task.creator')
+          th.py-3= t('views.task.executor')
+          th.py-3= t('views.task.createdAt')
+          th
+      tbody
+        each task in tasks
+          tr
+            td= task.id
+            td
+              a(href=route('task', { id: task.id }))= task.name
+            td= task.status.name
+            td= task.creator.name
+            td= _.get(task.executor, 'name')
+            td= formatDate(task.createdAt)
+            td
+              .d-flex
+                a.btn.btn-primary.me-1(href=route('editTask', { id: task.id }))= t('views.task.edit.submit')
+                +buttonTo(route('task', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.task.delete.submit'))

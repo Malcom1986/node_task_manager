@@ -1,0 +1,25 @@
+extends ../layouts/application.pug
+  
+block header
+  = t('layouts.application.taskStatuses')
+
+block content
+  a.btn.btn-primary(href=route('newStatus'))= t('views.taskStatus.create')
+  div.table-responsive
+    table.table.table-borderless.table-striped.mt-5.bg-white
+      thead
+        tr
+          th.py-3= t('views.taskStatus.id')
+          th.py-3= t('views.taskStatus.name')
+          th.py-3= t('views.taskStatus.createdAt')
+          th
+      tbody
+        each taskStatus in taskStatuses
+          tr
+            td= taskStatus.id
+            td= taskStatus.name
+            td= formatDate(taskStatus.createdAt)
+            td
+              .d-flex
+                a.btn.btn-primary.me-1(href=route('editStatus', { id: taskStatus.id }))= t('views.taskStatus.edit.submit')
+                +buttonTo(route('status', { id: taskStatus.id }), 'delete')(class="btn btn-danger" value=t('views.taskStatus.delete.submit'))

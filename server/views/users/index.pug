@@ -1,0 +1,26 @@
+extends ../layouts/application.pug
+
+block header
+  = t('layouts.application.users')
+
+block content
+  div.table-responsive
+    table.table.table-borderless.table-striped.mt-5.bg-white
+      thead
+        tr
+          th= t('views.user.id')
+          th= t('views.user.name')
+          th= t('views.user.email')
+          th= t('views.user.createdAt')
+          th Действия
+      tbody
+        each user in users
+          tr
+            td= user.id
+            td= user.name
+            td= user.email
+            td= formatDate(user.createdAt)
+            td
+              .d-flex.flex-wrap
+                a.btn.btn-primary.me-1(href=route('editUser', { id: user.id }))= t('views.user.edit.submit')
+                +buttonTo(route('user', { id: user.id }), 'delete')(class="btn btn-danger" value=t('views.user.delete.submit'))

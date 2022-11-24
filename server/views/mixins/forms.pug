@@ -1,0 +1,110 @@
+- const getEntityName = (entity) => _.camelCase(entity.constructor.name)
+- const getInputName = (property) => `data[${property}]`
+- const getInputId = (property) => `data_${property}`
+
+mixin formFor(entity = null)
+  form&attributes(attributes)
+    block
+
+mixin input(entity, propertyName, errors = {})
+  - error = _.get(errors, propertyName)
+  - inputName = getInputName(propertyName)
+  - inputId = getInputId(propertyName)
+  - entityName = getEntityName(entity)
+  .form-floating.mb-3
+    input.form-control(
+      id= inputId
+      name= inputName
+      class=(error && 'is-invalid')
+      value=_.get(entity, propertyName, '')
+      placeholder= t(`views.${entityName}.${propertyName}`)
+    )&attributes(attributes)
+    if error
+      .form-control-feedback(class=(error && 'invalid-feedback'))= error.map(({ message }) => message).join('. ')
+    label(
+      for= inputId
+    )= t(`views.${entityName}.${propertyName}`)
+   
+mixin textarea(entity, propertyName, errors = {})
+  - error = _.get(errors, propertyName)
+  - inputName = getInputName(propertyName)
+  - inputId = getInputId(propertyName)
+  - entityName = getEntityName(entity)
+  .mb-3
+    label(
+      for= inputId
+    )= t(`views.${entityName}.${propertyName}`)
+    textarea.form-control(
+      id= inputId
+      name= inputName
+      class=(error && 'is-invalid')
+    )&attributes(attributes)= _.get(entity, propertyName, '')
+    if error
+      .form-control-feedback(class=(error && 'invalid-feedback'))= error.map(({ message }) => message).join('. ')
+
+mixin select(entity, propertyName, errors = {}, options)
+  - error = _.get(errors, propertyName)
+  - inputName = getInputName(propertyName)
+  - inputId = getInputId(propertyName)
+  - entityName = getEntityName(entity)
+  .mb-3
+    label(
+      for= inputId
+    )= t(`views.${entityName}.${propertyName}`)
+    select.form-control(
+      id= inputId
+      name= inputName
+      class=(error && 'is-invalid')
+    )&attributes(attributes)
+      if !_.has(attributes, 'multiple')
+        option
+      - selectedOptions = entity[propertyName] ? [entity[propertyName]].flat().map(Number) : []
+      each option in options
+        - isSelect = _.includes(selectedOptions, option.id)
+        option(value= option.id selected= isSelect)= option.name
+    if error
+      .form-control-feedback(class=(error && 'invalid-feedback'))= error.map(({ message }) => message).join('. ')
+
+mixin filterSelect(entityName, filterOptions, propertyName, options)
+  - inputId = getInputId(propertyName)
+  div.input-group.mb-3
+    label.input-group-text(for= inputId)
+      = t(`views.${entityName}.filter.${propertyName}`)
+    select.form-select(id= inputId name= propertyName)&attributes(attributes)
+      option
+        each option in options
+          - isSelect = option.id === Number(filterOptions[propertyName]);
+          option(value= option.id selected= isSelect)= option.name
+
+mixin filterInput(entityName, filterOptions, propertyName)
+  - inputId = getInputId(propertyName)
+  .mb-3
+    label(
+      for= inputId
+    )= t(`views.${entityName}.filter.${propertyName}`)
+    input.form-control(
+      id= inputId
+      name= propertyName
+      value= _.get(filterOptions, propertyName, '')
+    )&attributes(attributes)
+
+mixin filterCheckBox(entityName, filterOptions, propertyName)
+  - inputId = getInputId(propertyName)
+  .mb-3.form-check
+    input.form-check-input(
+      id= inputId
+      type='checkbox'
+      name= propertyName
+      checked= filterOptions[propertyName]
+    )
+    label.form-check-label(
+      for= inputId
+    )= t(`views.${entityName}.filter.${propertyName}`)
+
+mixin submit(form = null)
+  input(class='btn btn-primary' type='submit')&attributes(attributes)
+
+mixin buttonTo(action, method)
+  form(action=action, method="post")
+    input(name="_method" type="hidden" value=method)
+    input(type='submit')&attributes(attributes)
